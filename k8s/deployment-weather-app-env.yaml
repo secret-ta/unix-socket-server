@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-secret-example-deployment
+  labels:
+    app: k8s-secret-example
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-secret-example
+  template:
+    metadata:
+      labels:
+        app: k8s-secret-example
+    spec:
+      containers:
+      - name: springboot-k8s-secret-example
+        imagePullPolicy: Always
+        image:  kadeksuryam/spring-boot-k8s-secret-example-vul:latest-env
+        env:
+        - name: WEATHER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: weatherapikey
+              key: API_KEY
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /app/actuator/health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /app/actuator/health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 3
+
