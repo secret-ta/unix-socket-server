@@ -18,7 +18,7 @@ set -a
 set +a
 
 # Container Entry-point original commands
-exec $entrypoint
+exec $entrypoint "$@"
 EOF
 
 chmod +x /vol/entrypoint.sh
