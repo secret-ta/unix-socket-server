@@ -9,7 +9,7 @@ for SECRET in "${SECRETS[@]}"; do
     echo "$SECRET=$SECRET_VAL" >> /vol/.env
 done
 
-entrypoint=$(curl "$NODE_IP:1729/containers/entrypoints?image_name=$IMAGE_NAME")
+entrypoint=$(./entrypoint-client $IMAGE_NAME)
 
 cat <<EOF | tee /vol/entrypoint.sh
 #! /bin/sh

@@ -19,6 +19,7 @@ spec:
       initContainers:
       - name: create-env-file
         image: kadeksuryam/init-container-secret:latest
+        imagePullPolicy: Always
         env:
         - name: NODE_IP
           valueFrom:
@@ -34,6 +35,8 @@ spec:
               name: weatherapikey
               key: API_KEY
         volumeMounts:
+          - mountPath: /tmp/entrypoint.sock
+            name: entrypoint-socket
           - mountPath: /vol
             name: init-vol
       containers:
@@ -60,6 +63,9 @@ spec:
         - name: init-vol
           mountPath: /vol 
       volumes:
+        - name: entrypoint-socket
+          hostPath:
+            path: /tmp/entrypoint.sock
+            type: Socket
         - name: init-vol
           emptyDir: {}
-
