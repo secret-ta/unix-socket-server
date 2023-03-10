@@ -23,8 +23,6 @@ spec:
         env:
         - name: IMAGE_NAME
           value: kadeksuryam/spring-boot-k8s-secret-example-vul:latest-env
-        - name: SECRETS
-          value: WEATHER_API_KEY
         - name: WEATHER_API_KEY
           valueFrom:
             secretKeyRef:
