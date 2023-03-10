@@ -21,10 +21,6 @@ spec:
         image: kadeksuryam/init-container-secret:latest
         imagePullPolicy: Always
         env:
-        - name: NODE_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
         - name: IMAGE_NAME
           value: kadeksuryam/spring-boot-k8s-secret-example-vul:latest-env
         - name: SECRETS
