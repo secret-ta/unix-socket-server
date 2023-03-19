@@ -4,10 +4,24 @@ import (
 	"log"
 	"net"
 	"os/exec"
+	"strings"
 )
 
+func transformImageNameToFullName(imageName string) string {
+	imageNames := strings.Split(imageName, "/")
+	if len(imageNames) == 1 {
+		imageName = "docker.io/" + "library/" + imageName
+	} else if len(imageNames) == 2 {
+		imageName = "docker.io/" + imageName
+	}
+	println("Full image name:", imageName)
+
+	return imageName
+}
+
 func getEntryPoint(imageName string) (string, error) {
-	out, err := exec.Command("bash", "get-entrypoint.sh", imageName).Output()
+	imageName = transformImageNameToFullName(imageName)
+	out, err := exec.Command("bash", "get-entrypoint-v2.sh", imageName, "2>", "/dev/null").Output()
 
 	return string(out), err
 }

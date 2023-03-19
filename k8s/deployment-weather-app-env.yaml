@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: k8s-secret-example-deployment
+  name: k8s-secret-example-deployment-env
   labels:
     app: k8s-secret-example
 spec:
