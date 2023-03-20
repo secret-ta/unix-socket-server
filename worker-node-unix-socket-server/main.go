@@ -3,8 +3,11 @@ package main
 import (
 	"log"
 	"net"
+	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
+	"syscall"
 )
 
 func transformImageNameToFullName(imageName string) string {
@@ -21,12 +24,19 @@ func transformImageNameToFullName(imageName string) string {
 
 func getEntryPoint(imageName string) (string, error) {
 	imageName = transformImageNameToFullName(imageName)
-	out, err := exec.Command("bash", "get-entrypoint-v2.sh", imageName, "2>", "/dev/null").Output()
+	out, err := exec.Command("bash", "/var/lib/entrypoint/get-entrypoint-v2.sh", imageName, "2>", "/dev/null").Output()
+
+	if err != nil {
+		log.Printf("Error getting entry point for image %s: %v", imageName, err)
+		return "", err
+	}
 
 	return string(out), err
 }
 
 func entrypointServer(c net.Conn) {
+	defer c.Close()
+
 	for {
 		buf := make([]byte, 512)
 		nr, err := c.Read(buf)
@@ -47,17 +57,40 @@ func entrypointServer(c net.Conn) {
 }
 
 func main() {
-	l, err := net.Listen("unix", "/tmp/entrypoint.sock")
+	socketFile := "/tmp/entrypoint.sock"
+	l, err := net.Listen("unix", socketFile)
 	if err != nil {
 		log.Fatal("listen error:", err)
 	}
 
+	defer func() {
+		err := l.Close()
+		if err != nil {
+			log.Printf("Error closing listener: %v", err)
+		}
+		err = os.Remove(socketFile)
+		if err != nil {
+			log.Printf("Error removing socket file: %v", err)
+		}
+	}()
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		<-sig
+		log.Printf("Received signal, shutting down...")
+		err := l.Close()
+		if err != nil {
+			log.Printf("Error closing listener: %v", err)
+		}
+	}()
+
 	for {
-		fd, err := l.Accept()
+		conn, err := l.Accept()
 		if err != nil {
 			log.Fatal("accept error:", err)
 		}
 
-		go entrypointServer(fd)
+		go entrypointServer(conn)
 	}
 }
