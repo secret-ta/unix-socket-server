@@ -1,4 +1,5 @@
 
+curl -L -O https://github.com/secret-ta/unix-socket-server/blob/master/worker-node-unix-socket-server/entrypoint-server
 chmod +x entrypoint-server
 sudo mv entrypoint-server /usr/local/bin/
 sudo mkdir /var/lib/entrypoint
