@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+spec:
+  initContainers:
+  - name: create-env-file
+    image: kadeksuryam/init-container-secret:latest
+    imagePullPolicy: Always
+    env:
+    - name: IMAGE_NAME
+      value: nginx
+    volumeMounts:
+      - mountPath: /vol
+        name: init-vol
+  containers:
+    - name: nginx
+      image: nginx
+      command:
+        - /vol/init.sh
+      args:
+        - "-c"
+        - "/etc/nginx/nginx.conf"
+        - "-t"
+      volumeMounts:
+        - name: init-vol
+          mountPath: /vol
+  volumes:
+  - name: init-vol
+    emptyDir: {}

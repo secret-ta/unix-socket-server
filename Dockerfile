@@ -1,8 +1,7 @@
 FROM alpine
 
-RUN apk add --update --no-cache bash libc6-compat
+RUN apk add --update --no-cache bash libc6-compat skopeo jq
 
-COPY worker-node-unix-socket-client/entrypoint-client .
-COPY entrypoint-init.sh .
+COPY set-init-cmd.sh .
 
-ENTRYPOINT ["bash", "entrypoint-init.sh"] 
+ENTRYPOINT ["bash", "set-init-cmd.sh"] 
